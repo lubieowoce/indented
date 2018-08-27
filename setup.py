@@ -1,9 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-	name = 'indented',
+	name     = 'indented',
+	version  = '0.9.0',
 	packages = find_packages(),
-	version = '0.1.0',
+	
 	description = 'Tools for generating Python code and other indented text.',
-	keywords = 'codegen code generation indented macro',
+	keywords    = 'codegen code generation indented macro',
+
+	author       = 'J Uryga',
+	author_email = 'lolzatu2@gmail.com',
 )
