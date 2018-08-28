@@ -1,49 +1,51 @@
-"""
-Python code generation helpers.
+"""## Python code generation helpers
 
 This module contains functions that are meant to make generating python syntax easier.
 They're useful when you want to avoid gluing together parentheses, commas, etc.;
 and worrying about spaces between things and punctuation.
+Most of them just generate strings[1].
+The nice thing about that is that you can use as little or many of these functions as you want,
+and keep the rest in plain string literals.
 
-The nice thing about working with strings is that you can use as little or many 
-of these functions as you want, and keep the rest in plain string literals.
+[1] Except `cond`, which generates a indented.text.Text, because
+if-elif-else constructs are indented and multiline. 
 
+	>>> def_('foo', ['x', 'y'])
+	'def foo(x, y):'
 
-  >>> def_('foo', ['x', 'y'])
-  'def foo(x, y):'
-  
-  >>> with_n_([('open("xyz.txt")', 'f'), ('foo', '(x, y)')])
-  'with open("xyz.txt") as f, foo as (x, y):'
-  
-  >>> apply('foo', ['a', 'b'])
-  'foo(a, b)'
-  
-  >>> item('haystack', 'i')
-  'haystack[i]'
-  
-  >>> attr('obj', 'content')
-  'obj.content'
-  
-  >>> method('turtle', 'move_to', ['x', 'y', '0'])
-  'turtle.move_to(x, y, 0)'
+	>>> with_n_([('open("xyz.txt")', 'f'), ('foo', '(x, y)')])
+	'with open("xyz.txt") as f, foo as (x, y):'
+
+	>>> apply('foo', ['a', 'b'])
+	'foo(a, b)'
+
+	>>> item('haystack', 'i')
+	'haystack[i]'
+
+	>>> tuple_([]);  tuple_(['x']);  tuple_(['x', 'y']);
+	'()'
+	'(x,)'
+	'(x, y)'
   
 'lit'() [literal] is useful if you need to splice python values somewhere.
-Actually it's just `repr()` + a bit of logic that escapes {brackets} to avoid
-messing with `str.format()`'s string substitution.
 
-  >>> lit([1, 2, 3])
-  '[1, 2, 3]'
+	>>> lit([1, 2, 3])
+	'[1, 2, 3]'
 
- A `lit` makes a big difference:
-  >>> apply('foo', ["abc"]);   apply('foo', [lit("abc")])
-  'foo(abc)'
-  "foo('abc')"
-  
-  >>> lit({'x': 10}) # note the {{double brackets}}:
-  "{{'x': 10}}"
-  
-  >>> apply('foo', [lit(8), lit('abc'), lit([1, 2, 3])])
-  "foo(8, 'abc', [1, 2, 3])"
+A `lit` can make a big difference:
+
+	>>> apply('foo', ['abc']);   apply('foo', [lit('abc')])
+	'foo(abc)'
+	"foo('abc')"
+
+
+Other helpers:
+
+	>>> attr('obj', 'content')
+	'obj.content'
+
+	>>> method('turtle', 'move_to', ['x', 'y', '0'])
+	'turtle.move_to(x, y, 0)'
   
 """
 from .text import Tree
@@ -123,8 +125,12 @@ def tuple_(exprs: Iterable[str], parens=True) -> str:
 
 dict_ = lambda pairs: '{' + str.join(', ', ('{}: {}'.format(key, val) for (key, val) in pairs) )+ '}'
 
-literal = lambda x: escape_brackets_for_format(repr(x))
+escaped_literal = lambda x: escape_brackets_for_format(repr(x))
+esc_lit = escaped_literal
+
+literal = lambda x: repr(x)
 lit = literal
+
 doc = lambda s: cleandoc(s).split('\n')
 
 

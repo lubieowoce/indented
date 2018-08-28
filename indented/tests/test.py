@@ -1,10 +1,19 @@
+# allow this module to import the whole package
+if __name__ == '__main__':
+	import pathlib
+	import sys
+
+	here = pathlib.Path(__file__).resolve()
+	parent_package_location = here.parents[2]
+	sys.path.append(str(parent_package_location))
+
 
 def run_doctests():
 	import doctest
-	import indented.text
-	import indented.codegen
+	from indented import text
+	from indented import codegen
 
-	for mod in (indented.text, indented.codegen):
+	for mod in (text, codegen):
 		failure_count, test_count = doctest.testmod(mod)
 		if failure_count == 0:
 			print("{mod.__name__}: ran {test_count} tests, passed everything".format(**locals()))
@@ -15,7 +24,7 @@ def run_doctests():
 
 
 
-from indented import *
+from indented.text import *
 from indented.codegen import *
 
 def demo():

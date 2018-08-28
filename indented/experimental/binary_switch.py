@@ -1,31 +1,37 @@
+""" EXPERIMENTAL
 
-def binary(low, high, depth=0, prev_low=None, prev_high=None):
-    assert (
-        (low, high) != (prev_low, prev_high)
-        if (prev_low, prev_high) != (None, None)
-        else True), \
-        'stuck at {}'.format((prev_low, prev_high))
+In a codebase of mine (the 'sumtype' package)
+I generate a lot of code like this:
+    if x == 0:
+        ...
+    elif x == 1:
+        ...
+    ...
+    elif x == n:
+        ...
 
-    indent = '    '*depth
-    if low == high-1: 
-        # print(indent, '| _ ==', low, '.', sep='')
-        print(indent, 'x == ', low, sep='')
+So, we're matching `x` with a range [0..n].
+The idea of `switch_binsearch` is to do a binary search instead of
+checking the cases one by one. For n == 3, `switch_binsearch` would generate
+something like this:
+
+    if x < 2:
+        if x < 1:
+            # x == 0
+        else:
+            # x == 1
     else:
-        print(indent, '# [', low, ' ', high, ')', sep='')
-        # mid = int(math.ceil((low + high) / 2))
-        mid = ((low + high) // 2)
-        # print(indent, '| _ <= ', mid, sep='')
-        # print(indent, '/', '  ', low, sep='')
-        print(indent, 'if x < ', mid, ':', sep='')
-        binary(low, mid,  depth=depth+1, prev_low=low, prev_high=high)
-        # print(indent, '\\','  ', high, sep='')
-        print(indent, 'else:', sep='')
-        binary(mid, high, depth=depth+1, prev_low=low, prev_high=high)
+        if x < 3:
+            # x == 2
+        else:
+            # x == 3
 
+which is nice, because we only have to do ~log2(n) comparisons.
+That being said, this usecase might be too specific to be useful to others. 
+"""
 
-# binary(0, 4)
-from indented.text import flatten_tree
-from indented.codegen import if_, else_, cond, when, lit, tuple_, eval_def
+from ..text import flatten_tree
+from ..codegen import if_, else_, cond, when, lit, tuple_, eval_def
 from dis import dis as disassemble
 import dis
 
@@ -136,3 +142,30 @@ if __name__ == '__main__':
 # dis(choose)
 
 
+
+
+
+def binary(low, high, depth=0, prev_low=None, prev_high=None):
+    assert (
+        (low, high) != (prev_low, prev_high)
+        if (prev_low, prev_high) != (None, None)
+        else True), \
+        'stuck at {}'.format((prev_low, prev_high))
+
+    indent = '    '*depth
+    if low == high-1: 
+        # print(indent, '| _ ==', low, '.', sep='')
+        print(indent, 'x == ', low, sep='')
+    else:
+        print(indent, '# [', low, ' ', high, ')', sep='')
+        # mid = int(math.ceil((low + high) / 2))
+        mid = ((low + high) // 2)
+        # print(indent, '| _ <= ', mid, sep='')
+        # print(indent, '/', '  ', low, sep='')
+        print(indent, 'if x < ', mid, ':', sep='')
+        binary(low, mid,  depth=depth+1, prev_low=low, prev_high=high)
+        # print(indent, '\\','  ', high, sep='')
+        print(indent, 'else:', sep='')
+        binary(mid, high, depth=depth+1, prev_low=low, prev_high=high)
+
+# binary(0, 4)
