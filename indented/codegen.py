@@ -124,6 +124,8 @@ def tuple_(exprs: Iterable[str], parens=True) -> str:
 			return parens_fmt.format('{},'.format(first))
 
 dict_ = lambda pairs: '{' + str.join(', ', ('{}: {}'.format(key, val) for (key, val) in pairs) )+ '}'
+list_ = lambda exprs: '[' + str.join(', ', exprs) + ']'
+set_  = lambda exprs: ('{' + str.join(', ', exprs) + '}') if exprs else 'set()'
 
 escaped_literal = lambda x: escape_brackets_for_format(repr(x))
 esc_lit = escaped_literal
